@@ -48,25 +48,17 @@ public class SmellLocalListFragment extends Fragment {
                 noData.setVisibility(View.VISIBLE);
             }
             noData.setVisibility(View.GONE);
+            smellDataArrayList.clear();
             do {
                 String title = cursor.getString(cursor.getColumnIndexOrThrow("smell_title"));
                 String desc = cursor.getString(cursor.getColumnIndexOrThrow("smell_desc"));
-//                int hasImage = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow("has_image")));
-//
-//                if (hasImage == 1) {
-//                    String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
-//                    smellDataArrayList.add(new SmellTypesModal(title, desc, true, smellDataArrayList.size()));
-//                }
-//                else {
-                    smellDataArrayList.add(new SmellTypesModal(title, desc, false, smellDataArrayList.size()));
-//                }
-
+                String sense = cursor.getString(cursor.getColumnIndexOrThrow("sense"));
+                smellDataArrayList.add(new SmellTypesModal(title, desc, Integer.parseInt(sense), smellDataArrayList.size()));
             } while (cursor.moveToNext());
 
             smellDataAdapter = new SmellDataAdapter(smellDataArrayList, getContext());
             userDataRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             userDataRecyclerView.setVerticalScrollBarEnabled(true);
-            smellDataAdapter.notifyDataSetChanged();
             userDataRecyclerView.setAdapter(smellDataAdapter);
         }
 //        dbHandler.close();

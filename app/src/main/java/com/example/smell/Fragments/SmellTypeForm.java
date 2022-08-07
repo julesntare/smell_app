@@ -15,6 +15,7 @@ import com.example.smell.R;
 import com.example.smell.model.SmellTypesModal;
 import com.example.smell.smell_db.DBHandler;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,7 +25,8 @@ import java.util.Objects;
 public class SmellTypeForm extends Fragment {
     private FirebaseFirestore db;
     TextInputEditText titleField, descField;
-    Button imageUpload, saveButton;
+    SwitchMaterial sense;
+    Button saveButton;
     private DBHandler dbHandler;
     int flag;
 
@@ -43,6 +45,7 @@ public class SmellTypeForm extends Fragment {
         View view = inflater.inflate(R.layout.activity_smell_type_form, container, false);
         titleField = view.findViewById(R.id.titleField);
         descField = view.findViewById(R.id.descField);
+        sense = view.findViewById(R.id.bad_or_good);
         saveButton = view.findViewById(R.id.saveButton);
         db = FirebaseFirestore.getInstance();
         dbHandler = new DBHandler(requireContext());
@@ -59,11 +62,11 @@ public class SmellTypeForm extends Fragment {
             }
 
             if (flag == 1) {
-                saveToRemote(titleField.getText().toString(), descField.getText().toString(), v);
+                saveToRemote(titleField.getText().toString(), descField.getText().toString(), sense.isChecked(), v);
                 return;
             }
 
-            long result = dbHandler.insert(titleField.getText().toString(), descField.getText().toString());
+            long result = dbHandler.insert(titleField.getText().toString(), descField.getText().toString(), sense.isChecked());
             if (result > 0) {
                 Snackbar snackbar = Snackbar.make(v, "Smell Type well added!!!", Snackbar.LENGTH_LONG);
                 snackbar.show();
@@ -71,7 +74,12 @@ public class SmellTypeForm extends Fragment {
                 final Handler handler = new Handler();
                 handler.postDelayed(() -> {
                     // Do something after 2s = 2000ms
-                    requireActivity().getSupportFragmentManager().popBackStack();
+                    SmellLocalListFragment formFrag= new SmellLocalListFragment();
+                    requireActivity().getSupportFragmentManager().beginTransaction().detach(this).commit();
+                    requireActivity().getSupportFragmentManager().beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.thisView, formFrag, SmellTypeForm.class.getSimpleName())
+                            .commit();
                 }, 2000);
             }
             else {
@@ -84,20 +92,26 @@ public class SmellTypeForm extends Fragment {
         return view;
     }
 
-    private void saveToRemote(String smellTitle, String smellDesc, View v) {
+    private void saveToRemote(String smellTitle, String smellDesc, boolean sense, View v) {
 
         // creating a collection reference
         // for our Firebase Firestore database.
-        CollectionReference dbSmellTypes = db.collection("SmellTypes");
+        CollectionReference dbSmellTypes = db.collection("smell");
 
         // adding our data to our courses object class.
-        SmellTypesModal smellTypes = new SmellTypesModal(smellTitle, smellDesc, false, 1);
+        SmellTypesModal smellTypes = new SmellTypesModal(smellTitle, smellDesc, sense ? 1 : 0, 1);
 
         // below method is use to add data to Firebase Firestore.
         dbSmellTypes.add(smellTypes).addOnSuccessListener(documentReference -> {
             Snackbar snackbar = Snackbar.make(v, "Yay! data saved successfully", Snackbar.LENGTH_LONG);
-            snackbar.setBackgroundTint(Color.GREEN);
             snackbar.show();
+
+            final Handler handler = new Handler();
+            handler.postDelayed(() -> {
+                // Do something after 2s = 2000ms
+                requireActivity().getSupportFragmentManager().popBackStack();
+            }, 2000);
+
         }).addOnFailureListener(e -> {
             Snackbar snackbar = Snackbar.make(v, "Whoops! something went wrong", Snackbar.LENGTH_LONG);
             snackbar.setBackgroundTint(Color.RED);

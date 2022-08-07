@@ -24,30 +24,20 @@ public class DBHandler {
         dbHelper.close();
     }
 
-    public long insert(String name, String desc) {
+    public long insert(String name, String desc, boolean sense) {
         ContentValues contentValue = new ContentValues();
         contentValue.put(DBHelper.TITLE, name);
         contentValue.put(DBHelper.DESCRIPTION, desc);
+        contentValue.put(DBHelper.SENSE, sense);
         return database.insert(DBHelper.TABLE_NAME, null, contentValue);
     }
 
     public Cursor getSmellTypes() {
-        String[] columns = new String[]{DBHelper._ID, DBHelper.TITLE, DBHelper.DESCRIPTION};
+        String[] columns = new String[]{DBHelper._ID, DBHelper.TITLE, DBHelper.DESCRIPTION, DBHelper.SENSE};
         Cursor cursor = database.query(DBHelper.TABLE_NAME, columns, null, null, null, null, "smell_id DESC");
         if (cursor != null) {
             cursor.moveToFirst();
         }
         return cursor;
-    }
-
-    public int update(long _id, String name, String desc) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DBHelper.TITLE, name);
-        contentValues.put(DBHelper.DESCRIPTION, desc);
-        return database.update(DBHelper.TABLE_NAME, contentValues, DBHelper._ID + " = " + _id, null);
-    }
-
-    public void delete(long _id) {
-        database.delete(DBHelper.TABLE_NAME, DBHelper._ID + "=" + _id, null);
     }
 }

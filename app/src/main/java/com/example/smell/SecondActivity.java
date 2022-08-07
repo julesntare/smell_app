@@ -1,11 +1,9 @@
 package com.example.smell;
 
 import android.os.Bundle;
-import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.smell.Adapters.TabsAdapter;

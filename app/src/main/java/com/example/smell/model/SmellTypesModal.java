@@ -3,13 +3,13 @@ package com.example.smell.model;
 public class SmellTypesModal {
     int id;
     String smellType, smellDescriptions;
-    boolean hasImageReference;
+    boolean isGoodOrBad;
 
-    public SmellTypesModal(String smellType, String smellDescriptions, boolean hasImageReference, int id) {
+    public SmellTypesModal(String smellType, String smellDescriptions, int isGoodOrBad, int id) {
         this.id = id + 1;
         this.smellType = smellType;
         this.smellDescriptions = smellDescriptions;
-        this.hasImageReference = hasImageReference;
+        this.isGoodOrBad = isGoodOrBad == 1;
     }
 
     public int getId() {
@@ -36,11 +36,11 @@ public class SmellTypesModal {
         this.smellDescriptions = smellDescriptions;
     }
 
-    public boolean isHasImageReference() {
-        return hasImageReference;
+    public boolean getSense() {
+        return isGoodOrBad;
     }
 
-    public void setHasImageReference(boolean hasImageReference) {
-        this.hasImageReference = hasImageReference;
+    public void setIsGoodOrBad(boolean isGoodOrBad) {
+        this.isGoodOrBad = isGoodOrBad;
     }
 }
