@@ -29,6 +29,7 @@ public class SmellTypeForm extends Fragment {
     Button saveButton;
     private DBHandler dbHandler;
     int flag;
+    final Handler handler = new Handler();
 
     public SmellTypeForm(int flag) {
         this.flag = flag;
@@ -51,7 +52,7 @@ public class SmellTypeForm extends Fragment {
         dbHandler = new DBHandler(requireContext());
         dbHandler.open();
 
-        saveButton.setOnClickListener(v-> {
+        saveButton.setOnClickListener(v -> {
             if (Objects.requireNonNull(titleField.getText()).toString().isEmpty()) {
                 titleField.setError("Type is required");
                 return;
@@ -71,18 +72,16 @@ public class SmellTypeForm extends Fragment {
                 Snackbar snackbar = Snackbar.make(v, "Smell Type well added!!!", Snackbar.LENGTH_LONG);
                 snackbar.show();
 
-                final Handler handler = new Handler();
                 handler.postDelayed(() -> {
                     // Do something after 2s = 2000ms
-                    SmellLocalListFragment formFrag= new SmellLocalListFragment();
+                    SmellLocalListFragment formFrag = new SmellLocalListFragment();
                     requireActivity().getSupportFragmentManager().beginTransaction().detach(this).commit();
                     requireActivity().getSupportFragmentManager().beginTransaction()
                             .addToBackStack(null)
                             .replace(R.id.thisView, formFrag, SmellTypeForm.class.getSimpleName())
                             .commit();
                 }, 2000);
-            }
-            else {
+            } else {
                 Snackbar snackbar = Snackbar.make(v, "Whoop! Something went wrong", Snackbar.LENGTH_LONG);
                 snackbar.setBackgroundTint(Color.RED);
                 snackbar.show();
@@ -106,10 +105,14 @@ public class SmellTypeForm extends Fragment {
             Snackbar snackbar = Snackbar.make(v, "Yay! data saved successfully", Snackbar.LENGTH_LONG);
             snackbar.show();
 
-            final Handler handler = new Handler();
             handler.postDelayed(() -> {
                 // Do something after 2s = 2000ms
-                requireActivity().getSupportFragmentManager().popBackStack();
+                SmellRemoteListFragment formFrag = new SmellRemoteListFragment();
+                requireActivity().getSupportFragmentManager().beginTransaction().detach(this).commit();
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.remoteLayout, formFrag, SmellTypeForm.class.getSimpleName())
+                        .commit();
             }, 2000);
 
         }).addOnFailureListener(e -> {

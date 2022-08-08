@@ -21,10 +21,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class SmellRemoteListFragment  extends Fragment {
+public class SmellRemoteListFragment extends Fragment {
 
     private FirebaseFirestore db;
-    RecyclerView userDataRecyclerView;
+    RecyclerView smellDataRecyclerView;
     ArrayList<SmellTypesModal> smellDataArrayList;
     SmellDataAdapter smellDataAdapter;
     FloatingActionButton fabRemote;
@@ -32,41 +32,42 @@ public class SmellRemoteListFragment  extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.smell_remote_list_fragment, viewGroup, false);
         smellDataArrayList = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
-        userDataRecyclerView = view.findViewById(R.id.smellrecyclerview);
+        smellDataRecyclerView = view.findViewById(R.id.smellrecyclerview);
         fabRemote = view.findViewById(R.id.fab_remote);
         noData = view.findViewById(R.id.no_data);
+        noData.setVisibility(View.VISIBLE);
 
-        fabRemote.setOnClickListener(v-> {
-            SmellTypeForm formFrag= new SmellTypeForm(1);
+        fabRemote.setOnClickListener(v -> {
+            SmellTypeForm formFrag = new SmellTypeForm(1);
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .addToBackStack(null)
                     .replace(R.id.remoteLayout, formFrag, SmellTypeForm.class.getSimpleName())
                     .commit();
         });
 
+        smellDataArrayList.clear();
         db.collection("smell")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        noData.setVisibility(View.GONE);
-                        smellDataArrayList.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             smellDataArrayList.add(new SmellTypesModal(Objects.requireNonNull(document.getData().get("smellType")).toString(), Objects.requireNonNull(document.getData().get("smellDescriptions")).toString(), (boolean) document.getData().get("sense") ? 1 : 0, smellDataArrayList.size()));
-                            smellDataAdapter = new SmellDataAdapter(smellDataArrayList, getContext());
-                            userDataRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                            userDataRecyclerView.setVerticalScrollBarEnabled(true);
-                            smellDataAdapter.notifyDataSetChanged();
-                            userDataRecyclerView.setAdapter(smellDataAdapter);
                         }
                     } else {
                         System.out.println("Error getting documents: " + task.getException());
                     }
+                    if (smellDataArrayList.size() < 1) {
+                        noData.setVisibility(View.VISIBLE);
+                    }
+                    smellDataAdapter = new SmellDataAdapter(smellDataArrayList, getContext());
+                    smellDataRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    smellDataRecyclerView.setVerticalScrollBarEnabled(true);
+                    smellDataRecyclerView.setAdapter(smellDataAdapter);
                 });
-
         return view;
     }
 
